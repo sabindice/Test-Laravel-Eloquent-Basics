@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Hash;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -48,13 +49,8 @@ class UserController extends Controller
     {
         // TASK: find a user by $name and update it with $email
         //   if not found, create a user with $name, $email and random password
-
-        $user = User::updateOrCreate([
-            'name' => $name,
-        ], [
-            'email' => $email,
-            'password' => bcrypt(\Str::random(8)),
-        ]);
+        $user = User::firstOrNew(compact('name'), ['password' => \Hash::make(\Str::random())]);
+        $user->fill(compact('email'))->save();
 
         return view('users.show', compact('user'));
     }
